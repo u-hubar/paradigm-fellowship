@@ -1,66 +1,19 @@
-## Foundry
+# 2024 Paradigm Fellowship - Gaussian CDF Approximation
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
-
-Foundry consists of:
-
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
-
-## Documentation
-
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+```
+Implement a maximally optimized gaussian CDF on the EVM for arbitrary 18 decimal fixed point parameters x, μ, σ. Assume -1e20 ≤ μ ≤ 1e20 and 0 < σ ≤ 1e19. Should have an error less than 1e-8 vs errcw/gaussian for all x on the interval [-1e23, 1e23].
 ```
 
-### Test
+My calculation of Gaussian CDF is based on the Abramowitz and Stegun approximation of the error functionin order to avoid use of exponentiation due to gas cost and precision concerns for wide `x` range. Instead, I used a rational function approximation, which is more efficient for the Ethereum Virtual Machine (EVM). This approach maintains the required precision while being optimized for gas consumption.
 
-```shell
-$ forge test
-```
+![alt text](images/abramowitz-stegun-approx.png)
 
-### Format
+Code is written in inline assembly and optimized for gas efficiency:
 
-```shell
-$ forge fmt
-```
+![alt text](images/gas-consumption.png)
 
-### Gas Snapshots
+Code can be found in: `src/GaussianCDF.sol`
 
-```shell
-$ forge snapshot
-```
+Tests: `test/GaussianCDF.t.sol`
 
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Script for test data generation: `script/generate_test_data.py`
